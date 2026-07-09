@@ -17,23 +17,136 @@
 
         /* Side: floor picker */
         .floor-picker {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 15px; z-index: 10;
+            position: absolute; right: 48px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 32px; z-index: 10;
         }
         .floor-btn {
-            width: 80px; height: 80px; border-radius: 50%; border: none;
-            background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 24px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            width: 180px; height: 180px; border-radius: 50%; border: none;
+            background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            font-size: 52px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
         .floor-btn.active { background: #007bff; color: white; }
 
+        /* Kiosk panel sizing — tuned for 3000×4500 portrait display */
+        :root {
+            --info-panel-width: 1100px;
+            --nav-panel-width: 1200px;
+            --kiosk-pad: 48px;
+            --kiosk-radius: 28px;
+            --kiosk-font-sm: 28px;
+            --kiosk-font-md: 36px;
+            --kiosk-font-lg: 48px;
+            --kiosk-font-xl: 56px;
+            --nav-font-md: 42px;
+            --nav-font-lg: 56px;
+            --nav-font-xl: 64px;
+            --nav-widget-bottom: 48px;
+            --nav-widget-right: 48px;
+        }
+
         /* 資訊彈窗 (Info Panel) */
         #info-panel {
-            position: absolute; bottom: 30px; left: 30px; width: 300px;
-            background: white; padding: 20px; border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none;
-            transform: translateY(20px);
+            position: fixed; bottom: 48px; left: 48px; width: var(--info-panel-width);
+            max-height: calc(100vh - 96px);
+            background: white; border-radius: var(--kiosk-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25); display: none;
+            overflow-x: hidden; overflow-y: auto; font-family: sans-serif; z-index: 2000;
             transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #info-panel .info-body { padding: var(--kiosk-pad); }
+        #info-image-container { width: 100%; height: 480px; background: #f0f0f0; position: relative; }
+        #info-image-container .close-btn {
+            position: absolute; top: 24px; right: 24px;
+            background: rgba(0,0,0,0.3); color: white; border: none;
+            border-radius: 50%; width: 80px; height: 80px;
+            font-size: 36px; cursor: pointer; backdrop-filter: blur(5px);
+        }
+        #info-tag {
+            display: inline-block; padding: 12px 24px;
+            background: #e7f3ff; color: #007bff; border-radius: 12px;
+            font-size: var(--kiosk-font-sm); font-weight: bold; margin-bottom: 20px;
+        }
+        #info-title { margin: 0 0 28px 0; font-size: var(--kiosk-font-xl); color: #222; }
+        .info-specs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            margin-bottom: 32px; font-size: var(--kiosk-font-md); color: #555;
+        }
+        .info-specs .spec-box { background: #f8f9fa; padding: 24px; border-radius: 16px; }
+        .info-specs .spec-label { color: #888; font-size: var(--kiosk-font-sm); margin-bottom: 6px; }
+        .info-specs .spec-wide { grid-column: span 2; }
+        #info-desc { font-size: var(--kiosk-font-md); color: #666; line-height: 1.5; margin-bottom: 32px; }
+        .info-actions { display: flex; flex-direction: column; gap: 20px; }
+        .info-actions button {
+            width: 100%; padding: 28px; border-radius: 16px;
+            font-weight: bold; font-size: var(--kiosk-font-md); cursor: pointer; border: none;
+            font-family: sans-serif; color: white; text-align: center;
+            box-sizing: border-box; line-height: 1.2;
+        }
+        #info-link { background: #28a745; }
+        #info-link[hidden] { display: none; }
+        #set-as-start { background: #6f42c1; }
+        #set-as-end { background: #007bff; }
+
+        /* 導覽面板 — bottom-right corner widget */
+        .nav-widget {
+            position: fixed;
+            bottom: var(--nav-widget-bottom);
+            right: var(--nav-widget-right);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 28px;
+        }
+        #nav-toggle-btn {
+            padding: 40px 80px;
+            background: #007bff; color: white;
+            border: none; border-radius: 56px;
+            font-size: var(--nav-font-xl); font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+            white-space: nowrap;
+        }
+        #nav-toggle-btn.is-open {
+            background: #6c757d;
+        }
+        #nav-panel {
+            width: var(--nav-panel-width);
+            max-height: 70vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: var(--kiosk-radius);
+            padding: var(--kiosk-pad);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            font-family: sans-serif;
+            font-size: var(--nav-font-md);
+            transform-origin: bottom right;
+            transform: scale(0.92) translateY(24px);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s ease, opacity 0.35s ease;
+        }
+        #nav-panel.open {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #nav-panel h3 { margin: 0 0 8px 0; color: #333; font-size: var(--nav-font-lg); }
+        #nav-panel hr { margin: 24px 0; border: none; border-top: 2px solid #eee; }
+        #nav-panel label { font-size: var(--nav-font-md); font-weight: 600; }
+        #nav-panel select {
+            width: 100%; padding: 32px; margin: 16px 0 36px;
+            border-radius: 16px; border: 2px solid #ccc; font-size: var(--nav-font-md);
+        }
+        #nav-panel .nav-btn-primary {
+            width: 100%; padding: 40px; background: #28a745; color: white;
+            border: none; border-radius: 16px; cursor: pointer;
+            font-weight: bold; font-size: var(--nav-font-lg);
+        }
+        #nav-panel .nav-btn-secondary {
+            width: 100%; margin-top: 24px; background: #f8f9fa;
+            border: 2px solid #ddd; padding: 36px; cursor: pointer;
+            border-radius: 16px; font-size: var(--nav-font-md);
         }
         .room {
             cursor: pointer;
@@ -115,57 +228,57 @@
         <button class="floor-btn active" onclick="switchFloor(1, this)">1F</button>
     </div>
 
-    <button id="nav-toggle-btn" onclick="toggleNavPanel()" style="position: fixed; top: 20px; right: 20px; z-index: 1001; padding: 15px 25px; background: #007bff; color: white; border: none; border-radius: 30px; font-size: 18px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-        🔍 開啟導覽
-    </button>
-
-    <div id="nav-panel" style="position: fixed; top: 0; right: -350px; width: 300px; height: 100%; z-index: 1000; background: white; padding: 80px 25px 25px; box-shadow: -5px 0 20px rgba(0,0,0,0.1); transition: 0.4s; font-family: sans-serif;">
-        <h3 style="margin-top:0; color: #333;">路徑導覽</h3>
-        <hr>
-        <label>起點房間：</label><br>
-        <select id="start-room" style="width: 100%; padding: 10px; margin: 10px 0 20px; border-radius: 5px; border: 1px solid #ccc;"></select><br>
-        <label>終點房間：</label><br>
-        <select id="end-room" style="width: 100%; padding: 10px; margin: 10px 0 20px; border-radius: 5px; border: 1px solid #ccc;"></select><br>
-        <button onclick="startNavigation()" style="width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">開始導航</button>
-        <button onclick="clearNav()" style="width: 100%; margin-top: 10px; background: #f8f9fa; border: 1px solid #ddd; padding: 10px; cursor: pointer; border-radius: 5px;">清除路徑</button>
+    <div class="nav-widget">
+        <div id="nav-panel">
+            <h3>路徑導覽</h3>
+            <hr>
+            <label for="start-room">起點房間：</label><br>
+            <select id="start-room"></select><br>
+            <label for="end-room">終點房間：</label><br>
+            <select id="end-room"></select><br>
+            <button class="nav-btn-primary" onclick="startNavigation()">開始導航</button>
+            <button class="nav-btn-secondary" onclick="clearNav()">清除路徑</button>
+        </div>
+        <button id="nav-toggle-btn" onclick="toggleNavPanel()">
+            🔍 開啟導覽
+        </button>
     </div>
 
-    <div id="info-panel" style="position: fixed; bottom: 30px; left: 30px; width: 340px; background: white; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 2000; display: none; overflow: hidden; font-family: sans-serif; transition: 0.3s;">
-    
-        <div id="info-image-container" style="width: 100%; height: 180px; background: #f0f0f0; position: relative;">
+    <div id="info-panel">
+        <div id="info-image-container">
             <img id="info-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
             <div id="img-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #aaa;">
-                <span style="font-size: 30px;">🖼️</span>
-                <span style="font-size: 12px; margin-top: 5px;">No Image Available</span>
+                <span style="font-size: 72px;">🖼️</span>
+                <span style="font-size: var(--kiosk-font-sm); margin-top: 12px;">No Image Available</span>
             </div>
-            <button onclick="closeInfo()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.3); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; backdrop-filter: blur(5px);">✕</button>
+            <button class="close-btn" onclick="closeInfo()">✕</button>
         </div>
 
-        <div style="padding: 20px;">
-            <div id="info-tag" style="display: inline-block; padding: 3px 10px; background: #e7f3ff; color: #007bff; border-radius: 5px; font-size: 11px; font-weight: bold; margin-bottom: 10px;">CATEGORY</div>
-            <h2 id="info-title" style="margin: 0 0 15px 0; font-size: 22px; color: #222;">Room Name</h2>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; font-size: 13px; color: #555;">
-                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px;">
-                    <div style="color: #888; font-size: 11px;">SQ FT</div>
-                    <strong id="spec-sqft" style="color: #333;">--</strong>
+        <div class="info-body">
+            <div id="info-tag">CATEGORY</div>
+            <h2 id="info-title">Room Name</h2>
+
+            <div class="info-specs">
+                <div class="spec-box">
+                    <div class="spec-label">SQ FT</div>
+                    <strong id="spec-sqft">--</strong>
                 </div>
-                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px;">
-                    <div style="color: #888; font-size: 11px;">DEPOSIT</div>
-                    <strong id="spec-deposit" style="color: #333;">--</strong>
+                <div class="spec-box">
+                    <div class="spec-label">DEPOSIT</div>
+                    <strong id="spec-deposit">--</strong>
                 </div>
-                <div style="grid-column: span 2; background: #f8f9fa; padding: 10px; border-radius: 8px;">
-                    <div style="color: #888; font-size: 11px;">HOURLY RATE (General / Associate)</div>
-                    <strong id="spec-rate" style="color: #333;">--</strong>
+                <div class="spec-box spec-wide">
+                    <div class="spec-label">HOURLY RATE (General / Associate)</div>
+                    <strong id="spec-rate">--</strong>
                 </div>
             </div>
 
-            <p id="info-desc" style="font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 20px;">Description goes here...</p>
+            <p id="info-desc">Description goes here...</p>
 
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <a id="info-link" href="#" target="_blank" style="display: none; text-decoration: none; text-align: center; padding: 12px; background: #28a745; color: white; border-radius: 10px; font-weight: bold; font-size: 14px;">📅 Book This Room</a>
-                <button id="set-as-start" style="width: 100%; padding: 12px; background: #6f42c1; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">🏁 Set as Start</button>
-                <button id="set-as-end" style="width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">🚩 Navigate Here</button>
+            <div class="info-actions">
+                <button id="info-link" type="button" hidden>📅 Book This Room</button>
+                <button id="set-as-start">🏁 Set as Start</button>
+                <button id="set-as-end">🚩 Navigate Here</button>
             </div>
         </div>
     </div>
@@ -1846,17 +1959,11 @@
          id="path1-5"
          style="fill:#3f3f3f;fill-opacity:1" /></g></g>
 
-            <polyline id="nav-guide-line" points="" fill="none" stroke="#007bff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none; filter: drop-shadow(0px 0px 3px rgba(0,0,0,0.5));" />
+            <polyline id="nav-guide-line" points="" fill="none" stroke="#007bff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none; filter: drop-shadow(0px 0px 3px rgba(0,0,0,0.5));" />
                         
                 <g id="node-group" style="pointer-events: none;"></g>
             </svg>
         </div>
-    </div>
-
-    <div id="info-panel">
-        <h2 id="title">請選擇房間</h2>
-        <p id="desc">點擊地圖上的區域查看資訊</p>
-        <button onclick="document.getElementById('info-panel').style.display='none'">關閉</button>
     </div>
 
     <script src="data.js"></script>
@@ -1902,16 +2009,10 @@
         function toggleNavPanel() {
             const panel = document.getElementById('nav-panel');
             const btn = document.getElementById('nav-toggle-btn');
-            if (!isNavOpen) {
-                panel.style.right = "0";
-                btn.innerText = "✕ 關閉選單";
-                btn.style.background = "#6c757d";
-            } else {
-                panel.style.right = "-350px";
-                btn.innerText = "🔍 開啟導覽";
-                btn.style.background = "#007bff";
-            }
             isNavOpen = !isNavOpen;
+            panel.classList.toggle('open', isNavOpen);
+            btn.classList.toggle('is-open', isNavOpen);
+            btn.innerText = isNavOpen ? "✕ 關閉導覽" : "🔍 開啟導覽";
         }
 
         // 4. 綁定房間點擊事件
@@ -1949,7 +2050,9 @@
             // 預設隱藏圖片與連結
             document.getElementById('info-img').style.display = 'none';
             document.getElementById('img-placeholder').style.display = 'flex';
-            document.getElementById('info-link').style.display = 'none';
+            const linkBtn = document.getElementById('info-link');
+            linkBtn.hidden = true;
+            linkBtn.onclick = null;
 
             // --- 步驟 2：如果 data.js 裡有這筆資料，再覆蓋上去 ---
             if (room) {
@@ -1974,11 +2077,10 @@
                 }
 
                 // 預約連結處理
-                const linkBtn = document.getElementById('info-link');
                 if (room.link) {
-                    linkBtn.href = room.link;
                     linkBtn.innerText = room.link_text || "📅 Book This Space";
-                    linkBtn.style.display = 'block';
+                    linkBtn.hidden = false;
+                    linkBtn.onclick = () => window.open(room.link, '_blank');
                 }
             } else {
                 console.warn(`未定義的房間 ID: ${id}，已顯示預設空白資訊。`);
@@ -2343,6 +2445,7 @@
             polyline.setAttribute("fill", "none");
             polyline.setAttribute("stroke-linecap", "round");
             polyline.setAttribute("stroke-linejoin", "round");
+            polyline.setAttribute("style", "pointer-events: none;");
             
             targetSVG.appendChild(polyline);
         }
